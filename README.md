@@ -1,6 +1,6 @@
 # Gmail AI Dashboard
 
-A serverless AI assistant built on AWS that connects to your Google account and answers questions about your Gmail and Google Calendar using Amazon Bedrock (Claude 3.5 Haiku).
+A serverless AI assistant built on AWS that connects to your Google account and answers questions about your Gmail and Google Calendar using Amazon Bedrock (Claude 3.0 Haiku).
 
 ## Architecture
 
