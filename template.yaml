@@ -23,7 +23,7 @@ Parameters:
     Default: "https://placeholder.execute-api.us-east-1.amazonaws.com/Prod/callback"
 
 Resources:
-
+#Google login auth
   AuthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -47,7 +47,7 @@ Resources:
           Properties:
             Path: /callback
             Method: get
-
+#References inqueries to Bedrock
   AskFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -71,7 +71,7 @@ Resources:
           Properties:
             Path: /ask
             Method: options
-
+#All login sessions stored 
   SessionTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -86,7 +86,7 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
-
+# Bucket for frontend of website
   FrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
