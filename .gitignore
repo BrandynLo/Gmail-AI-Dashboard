@@ -1,0 +1,10 @@
+# SAM build artifacts
+.aws-sam/
+
+# Never commit real config
+samconfig.toml
+
+# Python
+__pycache__/
+*.pyc
+.env

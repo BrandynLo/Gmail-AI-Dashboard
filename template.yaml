@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    Environment:
+      Variables:
+        GOOGLE_CLIENT_ID: !Ref GoogleClientId
+        GOOGLE_CLIENT_SECRET: !Ref GoogleClientSecret
+        TABLE_NAME: !Ref SessionTable
+
+Parameters:
+  GoogleClientId:
+    Type: String
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+  RedirectUri:
+    Type: String
+    Description: "Your API Gateway callback URL - fill in after first deploy"
+    Default: "https://placeholder.execute-api.us-east-1.amazonaws.com/Prod/callback"
+
+Resources:
+
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/auth/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          REDIRECT_URI: !Ref RedirectUri
+          FRONTEND_URL: !GetAtt FrontendBucket.WebsiteURL
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Path: /auth
+            Method: get
+        Callback:
+          Type: Api
+          Properties:
+            Path: /callback
+            Method: get
+
+  AskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ask/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionTable
+        - Statement:
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: "arn:aws:bedrock:*::foundation-model/*"
+      Events:
+        Ask:
+          Type: Api
+          Properties:
+            Path: /ask
+            Method: post
+        AskOptions:
+          Type: Api
+          Properties:
+            Path: /ask
+            Method: options
+
+  SessionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ai-dashboard-sessions
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: session_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: session_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "ai-dashboard-frontend-${AWS::AccountId}"
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  FrontendUrl:
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  BucketName:
+    Value: !Ref FrontendBucket
