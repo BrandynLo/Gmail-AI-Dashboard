@@ -8,7 +8,7 @@ A serverless AI assistant built on AWS that connects to your Google account and 
 - **API Gateway** — REST API routing
 - **DynamoDB** — Session storage with TTL cleanup
 - **S3** — Static frontend hosting
-- **Amazon Bedrock** — Claude 3.5 Haiku for AI responses
+- **Amazon Bedrock** — Claude 3.0 Haiku for AI responses
 - **Google OAuth2** — Gmail and Calendar access
 
 ---
