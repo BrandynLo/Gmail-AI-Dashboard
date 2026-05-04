@@ -1,6 +1,10 @@
 # Gmail AI Dashboard
+Provisioned Lambda functions, API Gateway, DynamoDB, and S3 on AWS using AWS SAM and Python 3.12
 
-A serverless AI assistant built on AWS that connects to your Google account and answers questions about your Gmail and Google Calendar using Amazon Bedrock (Claude 3.0 Haiku).
+Integrated Amazon Bedrock (Claude 3.0 Haiku) to power an intelligent AI assistant that analyzes personal Gmail and Google Calendar data, delivering insights and responses to user queries–avaliable on the live web dashboard
+
+Implemented Google OAuth 2.0 authentication flow with token storage in DynamoDB to authorize and retrieve real-time
+email and calendar data from the Gmail and Google Calendar APIs
 
 ## Architecture
 
